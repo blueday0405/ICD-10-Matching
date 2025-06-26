@@ -35,10 +35,13 @@ env/
 
 # Project specific
 *.log
-*.csv
 *.xlsx
 *.pdf
 PDFs/
+
+# CSV files (except diagnosis.csv)
+*.csv
+!diagnosis.csv
 
 # Jupyter Notebook
 .ipynb_checkpoints
