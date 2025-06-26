@@ -1,0 +1,73 @@
+{
+    "name": "Musculoskeletal",
+    "rules": [
+        {
+            "category": "DIAGNOSIS",
+            "terms": [
+                "arthritis",
+                "basal joint arthritis",
+                "osteoarthritis",
+                "rheumatoid arthritis",
+                "degenerative joint disease",
+                "joint inflammation",
+                "carpometacarpal arthritis",
+                "thumb arthritis",
+                "hand arthritis",
+                "joint degeneration",
+                "joint disease",
+                "inflammatory arthritis",
+                "post-traumatic arthritis"
+            ]
+        },
+        {
+            "category": "PROBLEM",
+            "terms": [
+                "joint pain",
+                "stiffness",
+                "swelling",
+                "reduced mobility",
+                "joint instability",
+                "weakness",
+                "limited range of motion",
+                "joint deformity",
+                "thumb pain",
+                "hand pain",
+                "joint tenderness",
+                "morning stiffness",
+                "joint crepitus",
+                "difficulty gripping",
+                "difficulty pinching",
+                "reduced strength",
+                "joint inflammation"
+            ]
+        },
+        {
+            "category": "TREATMENT",
+            "terms": [
+                "viscosupplementation",
+                "joint injection",
+                "hyaluronic acid injection",
+                "corticosteroid injection",
+                "surgical options",
+                "joint replacement",
+                "arthroscopy",
+                "joint fusion",
+                "ligament reconstruction",
+                "physical therapy",
+                "occupational therapy",
+                "hand therapy",
+                "splinting",
+                "bracing",
+                "anti-inflammatory medication",
+                "NSAIDs",
+                "pain management",
+                "joint protection",
+                "activity modification",
+                "exercises",
+                "strengthening exercises",
+                "range of motion exercises",
+                "joint mobilization"
+            ]
+        }
+    ]
+}

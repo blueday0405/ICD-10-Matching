@@ -1,0 +1,78 @@
+{
+    "name": "ENT Procedures",
+    "rules": [
+        {
+            "category": "DIAGNOSIS",
+            "terms": [
+                "ear infection",
+                "otitis media",
+                "chronic ear infection",
+                "middle ear fluid",
+                "eustachian tube dysfunction",
+                "hearing loss",
+                "ear pressure",
+                "tympanic membrane perforation",
+                "ear drum perforation",
+                "chronic otitis",
+                "recurrent ear infection",
+                "serous otitis media"
+            ]
+        },
+        {
+            "category": "PROCEDURE",
+            "terms": [
+                "tympanostomy",
+                "ear tube placement",
+                "ear tubes",
+                "myringotomy",
+                "tube insertion",
+                "ear examination",
+                "hearing test",
+                "tympanometry",
+                "audiometry",
+                "ear drainage",
+                "ear cleaning",
+                "ear tube removal",
+                "ear tube check"
+            ]
+        },
+        {
+            "category": "PROBLEM",
+            "terms": [
+                "ear pain",
+                "ear drainage",
+                "hearing difficulties",
+                "balance problems",
+                "dizziness",
+                "ear fullness",
+                "ear popping",
+                "speech delay",
+                "language delay",
+                "fever",
+                "irritability",
+                "sleep disturbance",
+                "ear discomfort",
+                "water exposure"
+            ]
+        },
+        {
+            "category": "TREATMENT",
+            "terms": [
+                "antibiotics",
+                "ear drops",
+                "pain medication",
+                "water precautions",
+                "ear plugs",
+                "swimming protection",
+                "follow-up care",
+                "tube maintenance",
+                "ear protection",
+                "post-operative care",
+                "wound care",
+                "infection prevention",
+                "hearing protection",
+                "monitoring"
+            ]
+        }
+    ]
+}

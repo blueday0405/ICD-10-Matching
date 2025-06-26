@@ -1,0 +1,76 @@
+{
+    "name": "Endocrine",
+    "rules": [
+        {
+            "category": "DIAGNOSIS",
+            "terms": [
+                "thyroid disorder",
+                "thyroid nodule",
+                "thyroid mass",
+                "thyroid lesion",
+                "testosterone deficiency",
+                "low testosterone",
+                "hypogonadism",
+                "hormonal imbalance",
+                "endocrine disorder",
+                "thyroid dysfunction",
+                "hormone deficiency"
+            ]
+        },
+        {
+            "category": "PROCEDURE",
+            "terms": [
+                "thyroid biopsy",
+                "fine needle aspiration",
+                "FNA",
+                "thyroid FNA",
+                "needle biopsy",
+                "testosterone injection",
+                "testosterone cypionate",
+                "hormone replacement",
+                "hormone therapy",
+                "ultrasound guidance",
+                "thyroid ultrasound",
+                "hormone level testing",
+                "endocrine testing"
+            ]
+        },
+        {
+            "category": "PROBLEM",
+            "terms": [
+                "thyroid symptoms",
+                "neck mass",
+                "neck swelling",
+                "fatigue",
+                "weight changes",
+                "energy level changes",
+                "muscle weakness",
+                "decreased libido",
+                "mood changes",
+                "sleep problems",
+                "injection site pain",
+                "biopsy site pain",
+                "bruising",
+                "bleeding"
+            ]
+        },
+        {
+            "category": "TREATMENT",
+            "terms": [
+                "hormone replacement therapy",
+                "testosterone therapy",
+                "thyroid medication",
+                "monitoring",
+                "follow-up care",
+                "dose adjustment",
+                "injection schedule",
+                "post-procedure care",
+                "wound care",
+                "compression",
+                "ice application",
+                "pain management",
+                "laboratory monitoring"
+            ]
+        }
+    ]
+}

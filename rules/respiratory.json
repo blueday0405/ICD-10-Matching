@@ -1,0 +1,128 @@
+{
+    "name": "Respiratory Conditions",
+    "rules": [
+        {
+            "category": "DIAGNOSIS",
+            "terms": [
+                "bronchiolitis",
+                "pediatric bronchiolitis",
+                "emphysema",
+                "COPD",
+                "chronic obstructive pulmonary disease",
+                "respiratory infection",
+                "lower respiratory tract infection",
+                "viral bronchiolitis",
+                "RSV bronchiolitis",
+                "respiratory syncytial virus",
+                "RSV",
+                "chronic bronchitis",
+                "pulmonary emphysema",
+                "alpha-1 antitrypsin deficiency",
+                "respiratory disease",
+                "airway disease",
+                "lung disease"
+            ]
+        },
+        {
+            "category": "SYMPTOMS",
+            "terms": [
+                "coughing",
+                "wheezing",
+                "shortness of breath",
+                "dyspnea",
+                "rapid breathing",
+                "tachypnea",
+                "difficulty breathing",
+                "respiratory distress",
+                "nasal congestion",
+                "nasal flaring",
+                "chest retractions",
+                "barrel chest",
+                "decreased appetite",
+                "fatigue",
+                "cyanosis",
+                "blue lips",
+                "blue fingernails",
+                "chronic cough",
+                "mucus production",
+                "sputum production",
+                "chest tightness",
+                "decreased exercise tolerance"
+            ]
+        },
+        {
+            "category": "TREATMENT",
+            "terms": [
+                "bronchodilators",
+                "albuterol",
+                "beta-2 agonists",
+                "anticholinergics",
+                "inhaled steroids",
+                "corticosteroids",
+                "oxygen therapy",
+                "supplemental oxygen",
+                "nebulizer treatment",
+                "inhaler",
+                "metered dose inhaler",
+                "MDI",
+                "spacer device",
+                "pulmonary rehabilitation",
+                "breathing exercises",
+                "chest physiotherapy",
+                "airway clearance",
+                "smoking cessation",
+                "vaccinations",
+                "flu vaccine",
+                "pneumonia vaccine",
+                "hydration therapy",
+                "suction",
+                "nasal suction"
+            ]
+        },
+        {
+            "category": "RISK_FACTORS",
+            "terms": [
+                "smoking",
+                "secondhand smoke",
+                "tobacco use",
+                "air pollution",
+                "occupational exposure",
+                "chemical exposure",
+                "dust exposure",
+                "prematurity",
+                "young age",
+                "daycare attendance",
+                "crowded living conditions",
+                "family history",
+                "genetic factors",
+                "alpha-1 antitrypsin deficiency",
+                "immune system deficiency",
+                "viral infections",
+                "bacterial infections"
+            ]
+        },
+        {
+            "category": "MONITORING",
+            "terms": [
+                "peak flow meter",
+                "pulse oximetry",
+                "oxygen saturation",
+                "respiratory rate",
+                "breathing rate",
+                "heart rate",
+                "lung function tests",
+                "spirometry",
+                "PFTs",
+                "pulmonary function tests",
+                "chest x-ray",
+                "CT scan",
+                "blood gases",
+                "arterial blood gases",
+                "ABG",
+                "oxygen levels",
+                "breathing patterns",
+                "work of breathing"
+            ]
+        }
+    ]
+}
