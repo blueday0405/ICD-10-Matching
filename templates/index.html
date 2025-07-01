@@ -37,6 +37,36 @@
             font-weight: bold;
             color: #0066cc;
         }
+
+        .abbreviation {
+            background-color: #e2e3e5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin: 0 2px;
+            display: inline-block;
+        }
+
+        .subject-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .subject-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .first-paragraph {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-left: 3px solid #0066cc;
+        }
     </style>
 </head>
 
@@ -65,6 +95,21 @@
                     <div class="alert alert-info">
                         <strong>File: </strong><span id="filename"></span><br>
                         <strong>Total Terms Found: </strong><span id="totalTerms"></span>
+                    </div>
+
+                    <!-- Subject Information Section -->
+                    <div id="subjectInfo" class="subject-section">
+                        <div class="subject-title">Document Analysis</div>
+                        <div><strong>Title:</strong> <span id="docTitle"></span></div>
+                        <div><strong>Main Subject:</strong> <span id="titleSubject"></span></div>
+                        <div id="abbreviationsSection" style="display: none;">
+                            <strong>Found Abbreviations:</strong>
+                            <div id="foundAbbreviations" class="mt-2"></div>
+                        </div>
+                        <div class="first-paragraph mt-3">
+                            <strong>First Paragraph:</strong>
+                            <div id="firstParagraph" class="mt-2"></div>
+                        </div>
                     </div>
 
                     <table class="table table-striped">
@@ -114,6 +159,23 @@
                 // Display file info
                 document.getElementById('filename').textContent = data.filename;
                 document.getElementById('totalTerms').textContent = data.total_terms;
+
+                // Display subject information
+                document.getElementById('docTitle').textContent = data.title || 'Not found';
+                document.getElementById('titleSubject').textContent = data.title_subject || 'Not found';
+                document.getElementById('firstParagraph').textContent = data.first_paragraph || 'Not found';
+
+                // Display abbreviations if found
+                const abbreviationsSection = document.getElementById('abbreviationsSection');
+                const foundAbbreviations = document.getElementById('foundAbbreviations');
+                if (data.found_abbreviations && data.found_abbreviations.length > 0) {
+                    foundAbbreviations.innerHTML = data.found_abbreviations
+                        .map(abbr => `<span class="abbreviation">${abbr}</span>`)
+                        .join(' ');
+                    abbreviationsSection.style.display = 'block';
+                } else {
+                    abbreviationsSection.style.display = 'none';
+                }
 
                 // Display results
                 data.results.forEach(result => {

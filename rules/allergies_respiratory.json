@@ -1,0 +1,46 @@
+{
+  "name": "allergies_respiratory",
+  "description": "Rules for allergies respiratory domain",
+  "rules": [
+    {
+      "category": "GENERAL",
+      "terms": [
+        "allergen-proof covers",
+        "allergens",
+        "allergic reaction",
+        "allergic rhinitis",
+        "allergy triggers",
+        "antihistamines",
+        "asthma inhalers",
+        "asthma triggers",
+        "coughing",
+        "decongestants",
+        "dust mite allergies",
+        "dust mite control",
+        "dust mites",
+        "itchy eyes",
+        "mold allergies",
+        "mold exposure",
+        "mold spores",
+        "nasal congestion",
+        "nasal sprays",
+        "pollen allergies",
+        "sneezing"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "dust allergy treatment",
+        "mold allergy treatment",
+        "pollen allergy treatment"
+      ]
+    },
+    {
+      "category": "SYMPTOMS",
+      "terms": [
+        "asthma symptoms"
+      ]
+    }
+  ]
+}

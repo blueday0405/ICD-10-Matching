@@ -1,94 +1,82 @@
 {
-    "name": "Women's Health",
-    "rules": [
-        {
-            "category": "DIAGNOSIS",
-            "terms": [
-                "pregnancy",
-                "first trimester",
-                "second trimester",
-                "third trimester",
-                "placenta previa",
-                "placental abruption",
-                "false labor",
-                "braxton hicks",
-                "postpartum depression",
-                "gestational diabetes",
-                "puberty",
-                "menstruation",
-                "premenstrual syndrome",
-                "PMS",
-                "reproductive health",
-                "prenatal condition",
-                "pregnancy complications"
-            ]
-        },
-        {
-            "category": "PROCEDURE",
-            "terms": [
-                "glucose screening",
-                "glucose tolerance test",
-                "GTT",
-                "prenatal screening",
-                "ultrasound",
-                "pregnancy test",
-                "cervical exam",
-                "fetal monitoring",
-                "contraction monitoring",
-                "blood glucose monitoring",
-                "prenatal testing",
-                "genetic screening",
-                "pelvic exam",
-                "breast exam"
-            ]
-        },
-        {
-            "category": "PROBLEM",
-            "terms": [
-                "morning sickness",
-                "nausea",
-                "vomiting",
-                "vaginal bleeding",
-                "contractions",
-                "pelvic pain",
-                "back pain",
-                "swelling",
-                "edema",
-                "fatigue",
-                "mood changes",
-                "anxiety",
-                "depression",
-                "breast tenderness",
-                "cramping",
-                "spotting",
-                "physical changes",
-                "emotional changes",
-                "body changes",
-                "menstrual symptoms"
-            ]
-        },
-        {
-            "category": "TREATMENT",
-            "terms": [
-                "prenatal care",
-                "prenatal vitamins",
-                "folic acid",
-                "iron supplementation",
-                "calcium supplementation",
-                "bed rest",
-                "hydration",
-                "nutrition counseling",
-                "pregnancy education",
-                "childbirth classes",
-                "lactation support",
-                "mental health support",
-                "antidepressants",
-                "counseling",
-                "support groups",
-                "lifestyle modifications",
-                "exercise recommendations",
-                "dietary recommendations"
-            ]
-        }
-    ]
+  "name": "womens_health",
+  "description": "Rules for womens health domain",
+  "rules": [
+    {
+      "category": "GENERAL",
+      "terms": [
+        "antenatal depression",
+        "birth control",
+        "birth control implant",
+        "birth control options",
+        "birth control patch",
+        "birth control shot",
+        "birth control side effects",
+        "contraception",
+        "contraceptive methods",
+        "copper iud",
+        "dangerous bleeding in pregnancy",
+        "ectopic pregnancy",
+        "emergency birth control",
+        "emergency contraception",
+        "fallopian tube rupture",
+        "first trimester pregnancy",
+        "heartburn relief",
+        "hormonal birth control",
+        "hormonal iud",
+        "leg cramps during pregnancy",
+        "levonorgestrel",
+        "long-acting reversible contraception",
+        "methotrexate",
+        "morning sickness",
+        "morning-after pill",
+        "postpartum depression",
+        "pregnancy exercise",
+        "pregnancy fatigue",
+        "pregnancy hormone beta hcg",
+        "pregnancy mental health",
+        "pregnancy nutrition",
+        "pregnancy wellness",
+        "prenatal exercise",
+        "prenatal nutrition",
+        "prenatal vitamins",
+        "quickening",
+        "second trimester pregnancy",
+        "third trimester pregnancy",
+        "time-release birth control",
+        "ulipristal acetate",
+        "vaginal ring"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "birth control treatment",
+        "contraception treatment",
+        "ectopic pregnancy treatment",
+        "emergency contraception treatment",
+        "hemorrhoids treatment",
+        "methotrexate treatment"
+      ]
+    },
+    {
+      "category": "CARE",
+      "terms": [
+        "hormone levels monitoring",
+        "leg cramps management",
+        "pregnancy care",
+        "prenatal care",
+        "second trimester care",
+        "stis prevention"
+      ]
+    },
+    {
+      "category": "SYMPTOMS",
+      "terms": [
+        "abdominal pain in pregnancy",
+        "pregnancy symptoms",
+        "second trimester symptoms"
+      ]
+    }
+  ]
 }

@@ -15,6 +15,10 @@ from typing import List, Dict
 import csv
 from io import BytesIO
 import os
+import fitz
+from collections import defaultdict
+import re
+from extract_subect import extract_subject_from_title, medical_abbreviations
 
 app = FastAPI(
     title="Medical Text Analysis API",
@@ -34,16 +38,8 @@ app.add_middleware(
 # Mount templates directory
 templates = Jinja2Templates(directory="templates")
 
-# Load medspacy model
-try:
-    print("Loading medspacy model...")
-    nlp = medspacy.load()
-    print("MedSpaCy pipeline components:", nlp.pipe_names)
-except Exception as e:
-    print(f"Error loading medspacy: {e}")
-    print("Falling back to en_core_sci_lg...")
-    nlp = spacy.load("en_core_sci_lg")
-    print("SpaCy pipeline components:", nlp.pipe_names)
+# Initialize medspacy with custom configuration
+nlp = medspacy.load()
 
 # Load ICD-10 codes from CSV
 def load_icd10_codes():
@@ -53,99 +49,326 @@ def load_icd10_codes():
 # Initialize ICD-10 codes
 icd10_data = load_icd10_codes()
 
-def load_rules_from_json(domain: str = None) -> List[TargetRule]:
-    """Load rules from JSON files in the rules directory"""
-    rules = []
-    rules_dir = Path("rules")
+def preprocess_text(text: str) -> str:
+    """Preprocess text for better matching"""
+    # Convert to lowercase
+    text = text.lower()
+    # Normalize whitespace
+    text = ' '.join(text.split())
+    # Handle basic medical abbreviations
+    text = text.replace('w/', 'with ')
+    text = text.replace('h/o', 'history of ')
+    text = text.replace('s/p', 'status post ')
+    # Remove special characters but keep word boundaries
+    text = re.sub(r'[^a-z0-9\s/-]', ' ', text)
+    return text.strip()
+
+def is_valid_term_match(text: str, term: str) -> bool:
+    """
+    Validate if a term match is legitimate by checking word boundaries and context
+    """
+    text = text.lower()
+    term = term.lower()
     
-    # If no domain specified, load all rule files
-    if domain is None:
-        rule_files = rules_dir.glob("*.json")
-    else:
-        rule_files = [rules_dir / f"{domain.lower()}.json"]
+    # Create word boundary pattern
+    pattern = r'\b' + re.escape(term) + r'(?:s|es)?\b'
+    match = re.search(pattern, text)
     
-    for rule_file in rule_files:
-        if rule_file.exists():
-            print(f"Loading rules from {rule_file}")
-            with open(rule_file, 'r') as f:
-                rule_data = json.load(f)
-                for category in rule_data['rules']:
-                    for term in category['terms']:
-                        rules.append(TargetRule(
-                            literal=term,
-                            category=category['category']
-                        ))
+    if not match:
+        return False
+        
+    # Get context around the match
+    start = max(0, match.start() - 30)  # Look at 30 chars before
+    end = min(len(text), match.end() + 30)  # and 30 chars after
+    context = text[start:end]
     
-    print(f"Loaded {len(rules)} rules")
-    return rules
+    # Check for negation words
+    negation_words = ['no', 'not', 'none', 'negative', 'denies', 'without', 'ruled out']
+    before_term = context[:context.find(term)].split()
+    
+    # Check last 3 words before term for negations
+    if any(word in negation_words for word in before_term[-3:]):
+        return False
+        
+    return True
 
 def detect_document_domain(text: str) -> str:
     """Detect the medical domain of the document based on its content"""
-    # Load all rule files
     rules_dir = Path("rules")
     domains = {}
+    
+    preprocessed_text = preprocess_text(text)
     
     for rule_file in rules_dir.glob("*.json"):
         with open(rule_file, 'r') as f:
             rule_data = json.load(f)
             domain_name = rule_data['name']
             term_count = 0
+            term_weights = {
+                'DIAGNOSIS': 2.0,  # Give more weight to diagnosis terms
+                'PROCEDURE': 1.5,
+                'SYMPTOMS': 1.2,
+                'TREATMENT': 1.0
+            }
             
-            # Count occurrences of terms from each domain
+            # Count weighted occurrences of terms from each domain
             for category in rule_data['rules']:
+                category_name = category.get('category', '')
+                weight = term_weights.get(category_name, 1.0)
+                
                 for term in category['terms']:
-                    if term.lower() in text.lower():
-                        term_count += 1
+                    if is_valid_term_match(preprocessed_text, term):
+                        term_count += weight
             
-            domains[rule_file.stem] = term_count
+            if term_count > 0:
+                domains[rule_file.stem] = term_count
     
-    # Return the domain with the most matches
+    # Return the domain with the most weighted matches
     if domains:
         best_domain = max(domains.items(), key=lambda x: x[1])
-        print(f"Detected domain: {best_domain[0]} with {best_domain[1]} matches")
         return best_domain[0]
     return None
 
-def extract_text_from_pdf(pdf_file: bytes) -> str:
-    """Extract text content from uploaded PDF file"""
-    try:
-        text = ""
-        # Convert bytes to BytesIO object
-        pdf_stream = BytesIO(pdf_file)
-        
-        print("\n=== PDF Extraction Debug ===")
-        print(f"PDF file size: {len(pdf_file)} bytes")
-        
-        with pdfplumber.open(pdf_stream) as pdf:
-            print(f"Number of pages: {len(pdf.pages)}")
-            for i, page in enumerate(pdf.pages, 1):
-                page_text = page.extract_text()
-                print(f"Page {i} text length: {len(page_text) if page_text else 0} characters")
-                if page_text:
-                    text += page_text + "\n"
-                else:
-                    print(f"Warning: Page {i} returned no text")
-        
-        print(f"Total extracted text length: {len(text)} characters")
-        if len(text) < 100:  # Show preview if text is very short
-            print("Text preview:", text[:100])
-        print("=========================\n")
-        return text
-    except Exception as e:
-        print(f"PDF processing error: {e}")
-        print(f"PDF file size: {len(pdf_file)} bytes")
-        print(f"PDF file type: {type(pdf_file)}")
-        import traceback
-        print(f"Full traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=400, detail=f"Error processing PDF: {str(e)}")
-
-def extract_medical_terms(text: str, domain: str = None) -> List[Dict]:
-    """Extract medical terms using medspacy"""
-    print("\n=== NLP Processing Debug ===")
-    print(f"Input text length: {len(text)}")
-    print("Current pipeline components:", nlp.pipe_names)
+def get_intro_between_h1_and_h2(pdf_bytes: bytes) -> str:
+    """Extract text between H1 and H2 tags from a PDF.
     
-    # Remove default pipelines that might interfere with entity recognition
+    This function:
+    1. Gets all text blocks from the first page
+    2. Identifies H1 (largest font size) as the title (can be multiple lines)
+    3. Finds the next largest font size as potential H2 or image/section break
+    4. Returns the title (H1) and text between H1 and first section break
+    """
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    if len(doc) == 0:
+        doc.close()
+        return ""
+    
+    # Get first page
+    page = doc[0]
+    blocks = page.get_text("dict")["blocks"]
+    
+    # Collect all text spans with their properties
+    spans_with_props = []
+    for block in blocks:
+        # Skip image blocks
+        if block.get("type") == 1:  # Image block
+            spans_with_props.append({
+                "text": "IMAGE_BREAK",
+                "size": 0,
+                "y": block["bbox"][1],
+                "block_id": id(block),
+                "is_image": True
+            })
+            continue
+            
+        for line in block.get("lines", []):
+            for span in line.get("spans", []):
+                text = span["text"].strip()
+                if text:
+                    spans_with_props.append({
+                        "text": text,
+                        "size": span["size"],
+                        "font": span["font"],
+                        "color": span["color"],
+                        "flags": span["flags"],
+                        "y": line["bbox"][1],
+                        "block_id": id(block),
+                        "is_image": False,
+                        "bbox": line["bbox"]  # Store full bounding box for better spacing detection
+                    })
+    
+    if not spans_with_props:
+        doc.close()
+        return ""
+
+    # Sort spans by Y position to maintain reading order
+    spans_with_props.sort(key=lambda x: x["y"])
+
+    # Find unique font sizes and sort them
+    text_sizes = sorted({s["size"] for s in spans_with_props if not s.get("is_image")}, reverse=True)
+    if len(text_sizes) < 2:
+        doc.close()
+        return " ".join(s["text"] for s in spans_with_props if not s.get("is_image"))
+
+    # H1 is the largest font size
+    h1_size = text_sizes[0]
+
+    # Extract title and content
+    title_parts = []
+    content_blocks = []
+    current_block = []
+    found_h1 = False
+    last_block_id = None
+    last_y = None
+    last_bbox = None
+
+    for span in spans_with_props:
+        text = span["text"]
+        size = span.get("size", 0)
+        block_id = span["block_id"]
+        y = span["y"]
+        is_image = span.get("is_image", False)
+        bbox = span.get("bbox")
+
+        # Handle H1 (title)
+        if not is_image and size >= h1_size * 0.95:
+            if not title_parts or block_id == last_block_id:
+                title_parts.append(text)
+                found_h1 = True
+                last_block_id = block_id
+            continue
+
+        # After title, collect content until we hit an image or a clear section break
+        if found_h1:
+            if is_image:
+                # Stop at first image
+                if current_block:
+                    content_blocks.append(current_block)
+                break
+            elif text.startswith("There are") or text.startswith("These are") or text.startswith("Types of"):
+                # Stop at section transitions
+                if current_block:
+                    content_blocks.append(current_block)
+                break
+            else:
+                # Check if this is a continuation of the current block or a new block
+                if last_bbox is not None:
+                    y_gap = bbox[1] - last_bbox[3]  # Distance between bottom of last line and top of current line
+                    if y_gap > 15:  # Large gap indicates new paragraph
+                        if current_block:
+                            content_blocks.append(current_block)
+                            current_block = []
+                
+                current_block.append(text)
+                last_bbox = bbox
+                last_y = y
+
+    # Add any remaining block
+    if current_block:
+        content_blocks.append(current_block)
+
+    doc.close()
+
+    # Combine title parts and content blocks
+    result = " ".join(title_parts) + "\n\n"
+    
+    # Join blocks with appropriate spacing
+    content_text = []
+    for block in content_blocks:
+        block_text = " ".join(block)
+        if block_text.strip():
+            content_text.append(block_text)
+    
+    result += "\n\n".join(content_text)
+    return result
+
+def extract_whole_content(pdf_bytes: bytes) -> str:
+    """Extract all text content from a PDF while preserving structure.
+    
+    This function:
+    1. Extracts text from all pages
+    2. Preserves text hierarchy (headers, body text)
+    3. Maintains paragraph structure
+    4. Handles multiple columns
+    5. Removes redundant whitespace
+    """
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    if len(doc) == 0:
+        doc.close()
+        return ""
+    
+    full_content = []
+    
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        
+        # Get blocks with their properties
+        blocks = page.get_text("dict")["blocks"]
+        
+        # Sort blocks by vertical position (y0) and then horizontal position (x0)
+        blocks.sort(key=lambda b: (b["bbox"][1], b["bbox"][0]))
+        
+        page_content = []
+        current_y = None
+        current_line = []
+        
+        for block in blocks:
+            if block.get("type") == 0:  # Text block
+                for line in block.get("lines", []):
+                    y_pos = line["bbox"][1]  # Vertical position
+                    
+                    # Start a new line if y position changes significantly
+                    if current_y is not None and abs(y_pos - current_y) > 5:
+                        if current_line:
+                            page_content.append(" ".join(current_line))
+                            current_line = []
+                    
+                    current_y = y_pos
+                    
+                    # Extract text from spans
+                    line_text = []
+                    for span in line.get("spans", []):
+                        text = span["text"].strip()
+                        if text:
+                            # Check if this is likely a header based on font size
+                            if span.get("size", 0) > 12:  # Adjust threshold as needed
+                                text = f"\n{text}\n"
+                            line_text.append(text)
+                    
+                    if line_text:
+                        current_line.extend(line_text)
+        
+        # Add any remaining line
+        if current_line:
+            page_content.append(" ".join(current_line))
+        
+        # Join page content with appropriate spacing
+        if page_content:
+            page_text = "\n".join(page_content)
+            # Add page break if not the last page
+            if page_num < len(doc) - 1:
+                page_text += "\n\n--- Page Break ---\n\n"
+            full_content.append(page_text)
+    
+    doc.close()
+    
+    # Join all pages and clean up whitespace
+    final_text = "\n".join(full_content)
+    # Clean up multiple newlines while preserving paragraph structure
+    final_text = re.sub(r'\n{3,}', '\n\n', final_text)
+    # Clean up multiple spaces
+    final_text = re.sub(r' {2,}', ' ', final_text)
+    
+    return final_text.strip()
+
+def load_rules_from_json(domain: str) -> list:
+    """Load and convert rules from JSON to TargetRule format"""
+    rules = []
+    try:
+        with open(f"rules/{domain}.json", 'r') as f:
+            data = json.load(f)
+            for category in data['rules']:
+                category_name = category['category']
+                for term in category['terms']:
+                    # Create pattern with word boundaries
+                    pattern = r'\b' + re.escape(term.lower()) + r'(?:s|es)?\b'
+                    rules.append(TargetRule(
+                        literal=term,
+                        category=category_name,
+                        pattern=pattern
+                    ))
+    except Exception as e:
+        print(f"Error loading rules for domain {domain}: {str(e)}")
+        return []
+    return rules
+
+def extract_medical_terms(text: str, domain: str = None) -> list:
+    """Extract medical terms using medspacy"""
+    # Preprocess the text
+    preprocessed_text = preprocess_text(text)
+    print(preprocessed_text)
+    
+    # Remove default pipelines that might interfere
     if "medspacy_pyrush" in nlp.pipe_names:
         nlp.remove_pipe("medspacy_pyrush")
     if "medspacy_context" in nlp.pipe_names:
@@ -153,58 +376,70 @@ def extract_medical_terms(text: str, domain: str = None) -> List[Dict]:
     
     # Ensure we have the target matcher
     if "medspacy_target_matcher" not in nlp.pipe_names:
-        print("Adding target matcher to pipeline...")
         target_matcher = nlp.add_pipe("medspacy_target_matcher")
     else:
-        print("Getting existing target matcher...")
         target_matcher = nlp.get_pipe("medspacy_target_matcher")
     
-    # Load rules based on detected or specified domain
+    # Detect domain if not provided
     if domain is None:
-        domain = detect_document_domain(text)
+        domain = detect_document_domain(preprocessed_text)
+        # If still None, use general_medical as default
+        if domain is None:
+            domain = "general_medical"
     
+    # Load and add rules
     rules = load_rules_from_json(domain)
     target_matcher.add(rules)
     
-    print("Processing text with NLP pipeline...")
-    doc = nlp(text)
+    # Process the text
+    doc = nlp(preprocessed_text)
     
-    print(f"Number of entities found: {len(doc.ents)}")
-    print("Entities found:", [f"{ent.text} ({ent.label_})" for ent in doc.ents])
+    # Track unique terms
+    unique_terms = {}
     
-    # Use a set to track unique terms
-    unique_terms = set()
-    entities = []
-    
+    # Process all entities
     for ent in doc.ents:
-        if ent.label_ in ["PROBLEM", "DIAGNOSIS", "TREATMENT", "PROCEDURE"]:
-            # Create a unique key from the text and label
-            term_key = (ent.text.lower(), ent.label_)
-            
-            # Only add if we haven't seen this term before
-            if term_key not in unique_terms:
-                unique_terms.add(term_key)
-                entity_info = {
-                    "text": ent.text,
-                    "label": ent.label_,
-                    "start": ent.start_char,
-                    "end": ent.end_char
+        # Create a unique key for the term
+        term_key = (ent.text.lower(), ent.label_)
+        
+        # Simple confidence scoring
+        confidence = 1.0
+        
+        # Boost multi-word terms
+        word_count = len(ent.text.split())
+        if word_count > 1:
+            confidence *= 1.2
+        
+        # Category weights
+        category_weights = {
+            'DIAGNOSIS': 1.2,
+            'PROCEDURE': 1.1,
+            'SYMPTOMS': 1.0,
+            'TREATMENT': 1.0
+        }
+        confidence *= category_weights.get(ent.label_, 0.9)
+        
+        # Only add terms that pass validation
+        if is_valid_term_match(preprocessed_text, ent.text):
+            if term_key not in unique_terms or confidence > unique_terms[term_key]['confidence']:
+                unique_terms[term_key] = {
+                    'text': ent.text,
+                    'label': ent.label_,
+                    'start': ent.start_char,
+                    'end': ent.end_char,
+                    'confidence': confidence
                 }
-                entities.append(entity_info)
     
-    print(f"Total unique entities extracted: {len(entities)}")
-    print("=========================\n")
+    # Convert to list and sort by confidence
+    entities = list(unique_terms.values())
+    entities.sort(key=lambda x: x['confidence'], reverse=True)
+    
     return entities
 
 def match_icd10_codes(term: str) -> List[Dict]:
     """Match medical terms to ICD-10 codes"""
     try:
-        print(f"\n=== Matching ICD-10 codes for term: {term} ===")
         matches = []
-        
-        # Debug information about the dataframe
-        print(f"DataFrame columns: {icd10_data.columns.tolist()}")
-        print(f"DataFrame shape: {icd10_data.shape}")
         
         try:
             # Search in both short and long descriptions
@@ -212,26 +447,20 @@ def match_icd10_codes(term: str) -> List[Dict]:
             exact_matches_long = icd10_data[icd10_data['LongDescription'].str.lower() == term.lower()]
             exact_matches = pd.concat([exact_matches_short, exact_matches_long]).drop_duplicates()
             
-            print(f"Number of exact matches found: {len(exact_matches)}")
-            
             for _, row in exact_matches.iterrows():
                 match = {
                     "code": str(row['CodeWithSeparator']),
                     "description": str(row['LongDescription']),
                     "match_type": "exact"
                 }
-                print(f"Adding exact match: {match}")
                 matches.append(match)
             
             # If no exact matches, search for partial matches
             if not matches:
-                print("No exact matches found, searching for partial matches...")
                 # Search in both descriptions using case-insensitive partial matching
                 partial_matches_short = icd10_data[icd10_data['ShortDescription'].str.lower().str.contains(term.lower(), na=False)]
                 partial_matches_long = icd10_data[icd10_data['LongDescription'].str.lower().str.contains(term.lower(), na=False)]
                 partial_matches = pd.concat([partial_matches_short, partial_matches_long]).drop_duplicates()
-                
-                print(f"Number of partial matches found: {len(partial_matches)}")
                 
                 # Limit the number of partial matches to avoid overwhelming results
                 max_partial_matches = 10
@@ -241,27 +470,53 @@ def match_icd10_codes(term: str) -> List[Dict]:
                         "description": str(row['LongDescription']),
                         "match_type": "partial"
                     }
-                    print(f"Adding partial match: {match}")
                     matches.append(match)
         
         except AttributeError as e:
-            print(f"Error during string matching: {e}")
-            print("This might be due to missing columns or null values")
             return []
             
-        print(f"Total matches found: {len(matches)}")
-        if matches:
-            print("Sample match structure:")
-            print(matches[0])
-        print("===============================\n")
         return matches
         
     except Exception as e:
-        print(f"Error in match_icd10_codes: {str(e)}")
-        print(f"Error type: {type(e)}")
         import traceback
-        print(f"Traceback: {traceback.format_exc()}")
         return []
+
+def extract_subjects_from_pdf(pdf_bytes: bytes) -> Dict[str, str]:
+    """Extract subjects from PDF title and first paragraph"""
+    # Get title and first paragraph
+    intro_text = get_intro_between_h1_and_h2(pdf_bytes)
+    if not intro_text:
+        return {"error": "Could not extract text from PDF"}
+    
+    # Split into lines to get title
+    lines = intro_text.split('\n')
+    if not lines:
+        return {"error": "No text found in PDF"}
+    
+    title = lines[0].strip()
+    
+    # Extract subject from title
+    title_subject = extract_subject_from_title(title, get_full_form=True)
+    
+    # Look for abbreviations in the first paragraph
+    first_paragraph = ' '.join(lines[1:]).strip()
+    found_abbreviations = []
+    
+    for abbrev, full_form in medical_abbreviations.items():
+        if abbrev in first_paragraph and f"{abbrev} (" not in first_paragraph:
+            # Check if the full form appears before the abbreviation
+            full_form_pos = first_paragraph.lower().find(full_form.lower())
+            abbrev_pos = first_paragraph.find(abbrev)
+            
+            if full_form_pos != -1 and full_form_pos < abbrev_pos:
+                found_abbreviations.append(f"{abbrev} ({full_form})")
+    
+    return {
+        "title": title,
+        "title_subject": title_subject,
+        "found_abbreviations": found_abbreviations,
+        "first_paragraph": first_paragraph
+    }
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -280,21 +535,16 @@ async def analyze_pdf(file: UploadFile = File(...)):
         # Read PDF content
         contents = await file.read()
         
-        print(f"\n=== PDF Upload Information ===")
-        print(f"Filename: {file.filename}")
-        print(f"Content length: {len(contents)} bytes")
-        print("=============================\n")
+        # Extract subjects first
+        subjects_info = extract_subjects_from_pdf(contents)
         
-        text = extract_text_from_pdf(contents)
-        
-        # Extract medical terms
+        # Extract medical terms from whole content
+        text = get_intro_between_h1_and_h2(contents)
         medical_terms = extract_medical_terms(text)
-        print(f"\n=== Found {len(medical_terms)} medical terms ===")
         
         # Match ICD-10 codes for each term
         results = []
         for term in medical_terms:
-            print(f"\nProcessing term: {term['text']}")
             icd10_matches = match_icd10_codes(term['text'])
             result = {
                 "term": term['text'],
@@ -302,24 +552,20 @@ async def analyze_pdf(file: UploadFile = File(...)):
                 "icd10_matches": icd10_matches if icd10_matches else [],  # Ensure it's always a list
                 "validation_status": "pending"  # Initial status
             }
-            print(f"Result for term: {result}")
             results.append(result)
-        
-        print(f"\n=== Final Results ===")
-        print(json.dumps(results, indent=2))  # Pretty print the results
-        print("====================\n")
         
         return JSONResponse(content={
             "filename": file.filename,
+            "title": subjects_info["title"],
+            "title_subject": subjects_info["title_subject"],
+            "found_abbreviations": subjects_info["found_abbreviations"],
+            "first_paragraph": subjects_info["first_paragraph"],
             "total_terms": len(medical_terms),
             "results": results
         })
         
     except Exception as e:
-        print(f"Error in analyze_pdf: {str(e)}")
-        print(f"Error type: {type(e)}")
         import traceback
-        print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

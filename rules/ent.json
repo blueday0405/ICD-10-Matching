@@ -1,0 +1,45 @@
+{
+  "name": "ent",
+  "description": "Rules for ent domain",
+  "rules": [
+    {
+      "category": "GENERAL",
+      "terms": [
+        "dizziness",
+        "ear barotrauma",
+        "ear fluid drainage",
+        "ear fullness",
+        "ear pressure",
+        "ear tubes",
+        "eustachian tube dysfunction",
+        "hearing improvement",
+        "hearing loss",
+        "recovery after ear tubes",
+        "tinnitus",
+        "tympanostomy tubes"
+      ]
+    },
+    {
+      "category": "SYMPTOMS",
+      "terms": [
+        "ear pain"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "ear barotrauma treatment",
+        "ear tube procedure care",
+        "ear tube surgery",
+        "eardrum surgery",
+        "pediatric ear surgery"
+      ]
+    },
+    {
+      "category": "DIAGNOSIS",
+      "terms": [
+        "ear infections"
+      ]
+    }
+  ]
+}

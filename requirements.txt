@@ -5,3 +5,14 @@ pdfplumber
 uvicorn
 python-multipart
 python-docx
+PyMuPDF
+sqlalchemy
+alembic
+psycopg2-binary
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+fastapi-sqlalchemy
+aiofiles
+beautifulsoup4
+requests

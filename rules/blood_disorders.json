@@ -1,0 +1,45 @@
+{
+  "name": "blood_disorders",
+  "description": "Rules for blood disorders domain",
+  "rules": [
+    {
+      "category": "GENERAL",
+      "terms": [
+        "anemia",
+        "blood transfusion",
+        "blood types",
+        "fatigue",
+        "oncology",
+        "plasma transfusion",
+        "platelet transfusion",
+        "red blood cell deficiency",
+        "red blood cells transfusion",
+        "shortness of breath",
+        "transfusion complications",
+        "white blood cells transfusion"
+      ]
+    },
+    {
+      "category": "DIAGNOSIS",
+      "terms": [
+        "cancer",
+        "cancer blood loss"
+      ]
+    },
+    {
+      "category": "CARE",
+      "terms": [
+        "anemia care",
+        "transfusion care"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "anemia during chemotherapy",
+        "anemia treatment",
+        "chemotherapy-induced anemia"
+      ]
+    }
+  ]
+}

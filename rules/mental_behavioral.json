@@ -1,0 +1,65 @@
+{
+  "name": "mental_behavioral",
+  "description": "Rules for mental behavioral domain",
+  "rules": [
+    {
+      "category": "DIAGNOSIS",
+      "terms": [
+        "bipolar disorder",
+        "generalized anxiety disorder",
+        "mood disorder treatment",
+        "mood disorders",
+        "mood disorders in new mothers",
+        "persistent depressive disorder",
+        "seasonal affective disorder"
+      ]
+    },
+    {
+      "category": "GENERAL",
+      "terms": [
+        "antidepressants",
+        "anxiety in children",
+        "anxiety in teens",
+        "children mental health",
+        "depression",
+        "depression after delivery",
+        "depression in older adults",
+        "elderly mental health",
+        "gad",
+        "geriatric depression",
+        "mania",
+        "maternal mental health",
+        "mood stabilizers",
+        "postpartum depression",
+        "ppd",
+        "suicide risk in seniors",
+        "teen mental health",
+        "worry and nervousness"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "depression treatment",
+        "pediatric anxiety treatment",
+        "ppd therapy",
+        "ppd treatment",
+        "talk therapy"
+      ]
+    },
+    {
+      "category": "CARE",
+      "terms": [
+        "gad care",
+        "older adult care",
+        "postpartum care"
+      ]
+    },
+    {
+      "category": "SYMPTOMS",
+      "terms": [
+        "depression symptoms"
+      ]
+    }
+  ]
+}

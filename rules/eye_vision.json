@@ -1,0 +1,48 @@
+{
+  "name": "eye_vision",
+  "description": "Rules for eye vision domain",
+  "rules": [
+    {
+      "category": "GENERAL",
+      "terms": [
+        "conjunctivitis",
+        "dry eyes",
+        "eye dryness",
+        "lubricating tears",
+        "newborn conjunctivitis",
+        "newborn eye discharge",
+        "pink eye",
+        "reflex tears",
+        "tear dysfunction"
+      ]
+    },
+    {
+      "category": "DIAGNOSIS",
+      "terms": [
+        "dry eye syndrome",
+        "eye infection in newborns"
+      ]
+    },
+    {
+      "category": "SYMPTOMS",
+      "terms": [
+        "ocular discomfort",
+        "pink eye symptoms"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "dry eye treatment",
+        "pink eye treatment"
+      ]
+    },
+    {
+      "category": "CARE",
+      "terms": [
+        "eye moisture management",
+        "neonatal eye care"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "pediatric",
+  "description": "Rules for pediatric domain",
+  "rules": [
+    {
+      "category": "GENERAL",
+      "terms": [
+        "adolescent health",
+        "body changes in girls",
+        "breast development",
+        "breast growth",
+        "estrogen",
+        "hormone changes",
+        "menstrual cramps",
+        "menstrual cycle",
+        "menstrual hygiene",
+        "menstrual periods",
+        "menstrual supplies",
+        "menstruation",
+        "mental changes during puberty",
+        "period supplies",
+        "puberty",
+        "puberty in girls",
+        "sexual health in puberty"
+      ]
+    },
+    {
+      "category": "CARE",
+      "terms": [
+        "puberty care"
+      ]
+    },
+    {
+      "category": "SYMPTOMS",
+      "terms": [
+        "puberty symptoms"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "acne treatment",
+        "puberty treatment"
+      ]
+    }
+  ]
+}

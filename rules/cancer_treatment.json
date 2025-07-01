@@ -1,0 +1,55 @@
+{
+  "name": "cancer_treatment",
+  "description": "Rules for cancer treatment domain",
+  "rules": [
+    {
+      "category": "DIAGNOSIS",
+      "terms": [
+        "anemia in cancer",
+        "anemia treatment in cancer",
+        "cancer care",
+        "cancer fatigue treatment",
+        "cancer patient support",
+        "cancer treatment fatigue",
+        "cancer-related anemia",
+        "cancer-related fatigue",
+        "fatigue in cancer",
+        "immunotherapy for kidney cancer",
+        "kidney cancer",
+        "kidney cancer treatment",
+        "managing cancer fatigue",
+        "renal cancer"
+      ]
+    },
+    {
+      "category": "GENERAL",
+      "terms": [
+        "blood in urine",
+        "blood transfusion",
+        "bone marrow suppression",
+        "fatigue intervention",
+        "iron and vitamin supplementation",
+        "kidney tumor",
+        "oncology",
+        "partial nephrectomy",
+        "persistent tiredness",
+        "radical nephrectomy",
+        "red blood cell deficiency",
+        "renal cell carcinoma"
+      ]
+    },
+    {
+      "category": "TREATMENT",
+      "terms": [
+        "erythropoietin therapy"
+      ]
+    },
+    {
+      "category": "CARE",
+      "terms": [
+        "energy management",
+        "fatigue care"
+      ]
+    }
+  ]
+}
